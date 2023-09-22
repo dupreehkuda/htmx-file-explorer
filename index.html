@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Browser</title>
+    <script src="https://unpkg.com/htmx.org@1.9.5" integrity="sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO" crossorigin="anonymous"></script>
+    <style>ul, ol {padding: 0 25px;}  .dir {color: #1db0c9;} .item{}</style>
+</head>
+<body>
+    <div>
+        {{ block "dir-list" .}}
+            <ul id="{{ .Path }}">
+                {{ range .FS }}
+                    <li {{ if .IsDir }} class="dir" {{ end }}>
+                        <a onmouseenter="this.setAttribute('id', this.parentNode.parentNode.id + '/' + {{ .Name }})"
+                           class="item"
+                           {{ if .IsDir }}
+                           hx-target="closest .dir"
+                           hx-swap="afterend"
+                           hx-get="/get"
+                           {{ end }}
+                        >
+                            {{ .Name }}
+                        </a>
+
+                        {{ if .IsDir }}
+                            <button>new</button>
+                            <button>upload</button>
+                        {{ end }}
+
+                        <button hx-post="/delete"
+                                hx-target="closest li"
+                                hx-swap="delete"
+                                hx-confirm="are you sure?"
+                                onclick="this.setAttribute('hx-params', {'path': button.previousElementSibling.getAttribute('id')})"
+                        >
+                            delete
+                        </button>
+
+                        <button>download</button>
+                    </li>
+                {{ end }}
+            </ul>
+        {{ end }}
+    </div>
+</body>
+</html>
